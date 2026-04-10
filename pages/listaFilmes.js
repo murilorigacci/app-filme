@@ -16,14 +16,14 @@ import {
 const MovieCard = ({ item, onRemove }) => {
     const [imgError, setImgError] = useState(false);
 
+    const imageUri = (imgError || !item.imagem)
+        ? 'https://via.placeholder.com/150x220/333/FFF?text=Sem+Capa'
+        : item.imagem;
+
     return (
         <View style={styles.itemLista}>
             <Image
-                source={{
-                    uri: imgError
-                        ? 'https://via.placeholder.com/150x220/333/FFF?text=Sem+Capa'
-                        : item.imagem,
-                }}
+                source={{ uri: imageUri }}
                 style={styles.capaFilme}
                 resizeMode="cover"
                 onError={() => setImgError(true)}
@@ -34,7 +34,10 @@ const MovieCard = ({ item, onRemove }) => {
                     {item.texto}
                 </Text>
 
-                <TouchableOpacity onPress={() => onRemove(item.id, item.texto)}>
+                <TouchableOpacity
+                    onPress={() => onRemove(item.id, item.texto)}
+                    activeOpacity={0.7}
+                >
                     <Text style={styles.textoBotaoRemover}>Remover do Catálogo</Text>
                 </TouchableOpacity>
             </View>
@@ -42,7 +45,7 @@ const MovieCard = ({ item, onRemove }) => {
     );
 };
 
-export default function App() {
+export default function ListaFilmes() {
     const [novaFilmeSerie, setNovaFilmeSerie] = useState('');
     const [urlImagem, setUrlImagem] = useState('');
     const [listaFilmeSerie, setListaFilmeSerie] = useState([]);
@@ -56,7 +59,7 @@ export default function App() {
         const novoItem = {
             id: Date.now().toString(),
             texto: novaFilmeSerie.trim(),
-            imagem: urlImagem.trim() || 'https://via.placeholder.com/150x220/333/FFF?text=Sem+Capa',
+            imagem: urlImagem.trim() !== '' ? urlImagem.trim() : null,
         };
 
         setListaFilmeSerie((prev) => [novoItem, ...prev]);
@@ -81,10 +84,11 @@ export default function App() {
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}>
+            style={styles.container}
+        >
             <View style={styles.header}>
                 <Text style={styles.titulo}>Movly</Text>
-                <Text style={styles.subtitulo}>Guarde seus filmes preferidos aqui mesmo!</Text>
+                <Text style={styles.subtitulo}>Guarde seus filmes preferidos!</Text>
             </View>
 
             <View style={styles.inputArea}>
@@ -98,7 +102,7 @@ export default function App() {
 
                 <TextInput
                     style={styles.input}
-                    placeholder="URL da imagem (opcional)"
+                    placeholder="URL da imagem (jpg, png...)"
                     placeholderTextColor="#888"
                     value={urlImagem}
                     onChangeText={setUrlImagem}
@@ -106,7 +110,10 @@ export default function App() {
                     keyboardType="url"
                 />
 
-                <TouchableOpacity style={styles.botaoAdicionar} onPress={adicionarFilmeSerie}>
+                <TouchableOpacity
+                    style={styles.botaoAdicionar}
+                    onPress={adicionarFilmeSerie}
+                >
                     <Text style={styles.textoBotaoAdicionar}>ADICIONAR</Text>
                 </TouchableOpacity>
             </View>
@@ -114,12 +121,14 @@ export default function App() {
             <FlatList
                 data={listaFilmeSerie}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => <MovieCard item={item} onRemove={removerFilmeSerie} />}
+                renderItem={({ item }) => (
+                    <MovieCard item={item} onRemove={removerFilmeSerie} />
+                )}
                 contentContainerStyle={{ paddingBottom: 40 }}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={() => (
                     <View style={styles.containerVazio}>
-                        <Text style={styles.textoVazio}>Seu catalogo está vazio!</Text>
+                        <Text style={styles.textoVazio}>Seu catálogo está vazio!</Text>
                     </View>
                 )}
             />
@@ -134,7 +143,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     header: {
-        marginTop: 60,
+        marginTop: 50,
         marginBottom: 20,
         alignItems: 'center',
     },
@@ -172,7 +181,7 @@ const styles = StyleSheet.create({
         elevation: 6,
     },
     textoBotaoAdicionar: {
-        color: '#888',
+        color: '#FFF',
         fontWeight: 'bold',
         fontSize: 16,
     },
@@ -188,6 +197,7 @@ const styles = StyleSheet.create({
     capaFilme: {
         width: 90,
         height: 130,
+        backgroundColor: '#222',
     },
     infoFilme: {
         flex: 1,

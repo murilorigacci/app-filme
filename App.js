@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import React from 'react';
 import {
     View,
@@ -5,23 +6,27 @@ import {
     TextInput,
     TouchableOpacity,
     StyleSheet,
-    SafeAreaView,
     ImageBackground,
 } from 'react-native';
 
-// Importando o hook necessário para a navegação funcionar
-import { useNavigation } from '@react-navigation/native';
+// Importação correta para evitar o aviso de depreciação
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-export default function CadastroScreen() {
-    // Inicializando a navegação
-    const navigation = useNavigation();
+import ListaFilmes from './pages/listaFilmes';
 
+const Stack = createStackNavigator();
+
+function LoginScreen({ navigation }) {
     return (
+        /* Usamos o SafeAreaView da nova biblioteca aqui */
         <SafeAreaView style={styles.container}>
             <ImageBackground
                 source={require('./assets/login.png')}
                 style={styles.background}
                 resizeMode="cover">
+
                 <Text style={styles.logo}>Movly</Text>
 
                 <View style={styles.card}>
@@ -42,7 +47,7 @@ export default function CadastroScreen() {
                         style={styles.input}
                     />
 
-                    <Text style={styles.label}>Senha (Mínimo 10 caracteres)</Text>
+                    <Text style={styles.label}>Senha</Text>
                     <TextInput
                         placeholder="escreva sua senha"
                         placeholderTextColor="#999"
@@ -50,18 +55,10 @@ export default function CadastroScreen() {
                         style={styles.input}
                     />
 
-                    <Text style={styles.label}>Repetir Senha</Text>
-                    <TextInput
-                        placeholder="Escreva sua senha novamente"
-                        placeholderTextColor="#999"
-                        secureTextEntry={true}
-                        style={styles.input}
-                    />
-
                     <TouchableOpacity
                         style={styles.button}
-                        // Navega para o nome da rota definida no seu Stack.Screen
-                        onPress={() => navigation.navigate('ListaFilmes')}>
+                        onPress={() => navigation.navigate('Lista')}
+                    >
                         <Text style={styles.buttonText}>Cadastrar-se</Text>
                     </TouchableOpacity>
                 </View>
@@ -70,9 +67,23 @@ export default function CadastroScreen() {
     );
 }
 
+export default function App() {
+    return (
+        <SafeAreaProvider>
+            <NavigationContainer>
+                <Stack.Navigator screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="Lista" component={ListaFilmes} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </SafeAreaProvider>
+    );
+}
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#000'
     },
     background: {
         flex: 1,
